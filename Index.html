@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cargando… 30 años</title>
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --ink:#14213d; --muted:#5b6578;
+  --track:#d9dfe8; --fill:#2f6fed; --fill2:#7aa5ff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10141c; --panel:#171d29; --ink:#e8ecf4; --muted:#93a0b8;
+    --track:#262e3f; --fill:#4f8bff; --fill2:#9bbcff;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10141c; --panel:#171d29; --ink:#e8ecf4; --muted:#93a0b8;
+  --track:#262e3f; --fill:#4f8bff; --fill2:#9bbcff;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+main{
+  width:100%; max-width:640px; background:var(--panel);
+  border-radius:14px; padding:28px 24px;
+  box-shadow:0 6px 24px rgba(20,33,61,.12);
+}
+h1{font-size:1.15rem; font-weight:600; margin:0 0 4px}
+p.sub{margin:0 0 22px; color:var(--muted); font-size:.95rem}
+.pct{
+  font-size:clamp(2.6rem,12vw,4.2rem); font-weight:700;
+  font-variant-numeric:tabular-nums; line-height:1; margin-bottom:14px;
+}
+.bar{
+  height:30px; background:var(--track); border-radius:8px;
+  overflow:hidden; border:2px solid var(--ink);
+}
+.fill{
+  height:100%; width:0%;
+  background:repeating-linear-gradient(115deg,var(--fill) 0 14px,var(--fill2) 14px 28px);
+}
+.dates{display:flex; justify-content:space-between; gap:12px; margin:8px 0 22px; color:var(--muted); font-size:.85rem}
+dl{margin:0; display:grid; grid-template-columns:1fr 1fr; gap:14px}
+dt{color:var(--muted); font-size:.85rem}
+dd{margin:2px 0 0; font-size:1.15rem; font-weight:600; font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<main>
+  <h1>Cargando Servicio</h1>
+ 
+  <div class="pct" id="pct">0.000000%</div>
+  <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar">
+    <div class="fill" id="fill"></div>
+  </div>
+  <div class="dates"><span>27/12/2013</span><span>27/12/2043</span></div>
+  <dl>
+    <div><dt>Tiempo transcurrido</dt><dd id="elapsed">–</dd></div>
+    <div><dt>Tiempo restante</dt><dd id="left">–</dd></div>
+  </dl>
+</main>
+
+<script>
+  // Mes en JS: 0 = enero, 11 = diciembre
+  const START = new Date(2013, 11, 27).getTime();
+  const END   = new Date(2043, 11, 27).getTime();
+  const DAY = 86400000;
+
+  const pct = document.getElementById('pct');
+  const fill = document.getElementById('fill');
+  const bar = document.getElementById('bar');
+  const elapsed = document.getElementById('elapsed');
+  const left = document.getElementById('left');
+
+  function fmt(ms){
+    const d = Math.floor(ms / DAY);
+    const y = Math.floor(d / 365.25);
+    const rest = Math.floor(d - y * 365.25);
+    return y + ' años, ' + rest + ' días';
+  }
+
+  function update(){
+    const now = Date.now();
+    const p = Math.min(100, Math.max(0, (now - START) / (END - START) * 100));
+    pct.textContent = p.toFixed(6) + '%';
+    fill.style.width = p + '%';
+    bar.setAttribute('aria-valuenow', p.toFixed(2));
+    elapsed.textContent = fmt(Math.max(0, now - START));
+    left.textContent = fmt(Math.max(0, END - now));
+  }
+
+  update();
+  setInterval(update, 100);
+</script>
+</body>
+</html>
